@@ -1,5 +1,8 @@
 Message = module.require('../dto/Message.js').Message;
 
+/**
+* Register a handler for a message type
+*/
 function registerMessageHandler(messageType, handler) {
     if (registerMessageHandler.htable == undefined) {
         registerMessageHandler.htable = {};
@@ -8,6 +11,9 @@ function registerMessageHandler(messageType, handler) {
     registerMessageHandler.htable[messageType] = handler;
 }
 
+/*
+* Function to dispatch messages
+*/
 function messageDispatcher(raw_message) {
     message = new Message(raw_message);
     message_type = message.getType();

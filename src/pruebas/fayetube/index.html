@@ -1,0 +1,184 @@
+<html>
+
+<head>
+<title>
+Pruebas Faye 
+</title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<script type="text/javascript" src="http://localhost:8000/fayetube/client.js"></script>
+<script type="text/javascript">
+
+	//Namespace Hell
+	var Hell = Hell || {};
+
+	Hell.Video = function Video(videoId) {
+		// attributes
+		// constructor 
+    	var params = { allowScriptAccess: "always" };
+    	var atts = { id: "myytplayer" };
+    	swfobject.embedSWF("http://www.youtube.com/v/"+videoId+"?enablejsapi=1&playerapiid=ytplayer&version=3",
+                       "ytapiplayer", "425", "356", "8", null, null, params, atts);	
+		// methods
+	}
+
+	// Dispatcher class
+	Hell.Dispatcher = function Dispatcher(evtCallback) {
+
+		// attributes
+		this.DEFCHANNEL = '/fayetube';	
+		this.client = undefined;
+		this.subscription = undefined;
+		this.evtCallback = evtCallback;
+
+		// methods
+		this.SendEvent = function(evt) {
+			var pub = this.client.publish(this.DEFCHANNEL, evt);
+			pub.errback( function(error) {
+				console.error(error.message);
+			});
+		}
+
+		this.Connect = function(connectCallback) {
+			this.client = new Faye.Client('http://localhost:8000/fayetube');
+			this.subscription = this.client.subscribe(this.DEFCHANNEL, this.evtCallback);
+			this.subscription.callback(function() {
+				console.info('Suscripcion bayeux completada.');
+				connectCallback();
+			});
+			this.subscription.errback(function(error) {
+				console.error(error.message);
+			});
+		}
+
+		this.Disconnect = function() {
+			this.subscription.cancel();
+			console.info('Suscripcion bayeux terminada.');
+		}
+	
+	};
+
+	// NetEvent class
+	
+	Hell.NetEvent = function NetEvent(type, value) {
+		this.type = type;
+		this.value = value;
+	};
+	Hell.NetEvent.EvtType = {
+		LOAD : 0,
+		PLAY : 1,
+		PAUSE : 2,
+		TOGGLESOUND : 3,
+		SEEK : 4
+	}
+
+	// Youtube plugin events
+	
+	function onYouTubePlayerReady(playerId) {
+		console.info('Youtube player ready.');
+		$('#myytplayer').addEventListener("onStateChange", "onytplayerStateChange");
+	}
+
+	function onytplayerStateChange(newState) {
+   		console.info("Player's new state:" + newState);
+	}
+
+	// Interface	
+	function disableVideoControls() {
+		$('#btnLoad').attr('disabled',true);	
+		$('#btnPlay').attr('disabled',true);	
+		$('#btnPause').attr('disabled',true);	
+		$('#btnMute').attr('disabled',true);	
+		$('#btnSeek').attr('disabled',true);	
+		$('#txtVideoId').attr('disabled',true);	
+		$('#txtSeek').attr('disabled',true);	
+	}
+
+	function enableVideoControls() {
+		$('#btnLoad').attr('disabled', false);	
+		$('#btnPlay').attr('disabled', false);	
+		$('#btnPause').attr('disabled', false);	
+		$('#btnMute').attr('disabled', false);	
+		$('#btnSeek').attr('disabled', false);	
+		$('#txtVideoId').attr('disabled', false);	
+		$('#txtSeek').attr('disabled', false);	
+	}
+
+	$(document).ready(function() {
+
+		Hell.VideoInstance = new Hell.Video($('#txtVideoId').val());
+
+		disableVideoControls();
+
+        $('#btnLoad').click( function() {
+			Hell.DispatcherInstance.SendEvent(new Hell.NetEvent(Hell.NetEvent.EvtType.LOAD, $('#txtVideoId').val()));
+		});
+		$('#btnPlay').click( function() {
+			Hell.DispatcherInstance.SendEvent(new Hell.NetEvent(Hell.NetEvent.EvtType.PLAY, 0));
+		});	
+        $('#btnPause').click( function() {
+			Hell.DispatcherInstance.SendEvent(new Hell.NetEvent(Hell.NetEvent.EvtType.PAUSE, 0));
+		});
+        $('#btnMute').click( function() {
+			Hell.DispatcherInstance.SendEvent(new Hell.NetEvent(Hell.NetEvent.EvtType.TOGGLESOUND, 0));
+		});
+        $('#btnSeek').click( function() {
+			Hell.DispatcherInstance.SendEvent(new Hell.NetEvent(Hell.NetEvent.EvtType.SEEK, $('#txtSeek').val()));
+		});
+
+	
+		$('#btnConectar').click( function() {
+
+				Hell.DispatcherInstance = new Hell.Dispatcher(function(evt) {
+					if(evt.type == Hell.NetEvent.EvtType.LOAD) {
+						$('#myytplayer').get(0).loadVideoById(evt.value);
+					} else if(evt.type == Hell.NetEvent.EvtType.PLAY) {
+						$('#myytplayer').get(0).playVideo();
+					} else if(evt.type == Hell.NetEvent.EvtType.PAUSE) {
+						$('#myytplayer').get(0).pauseVideo();
+					} else if(evt.type == Hell.NetEvent.EvtType.TOGGLESOUND) {
+						if($('#myytplayer').get(0).isMuted()) {
+							$('#myytplayer').get(0).unMute();
+						} else { 
+							$('#myytplayer').get(0).mute();
+						}
+					} else if(evt.type == Hell.NetEvent.EvtType.SEEK) {
+						$('#myytplayer').get(0).seekTo(evt.value,true);
+					}
+				});
+
+				Hell.DispatcherInstance.Connect( function() {
+					enableVideoControls();
+				});
+		});
+
+		$('#btnDesconectar').click( function() {
+			Hell.DispatcherInstance.Disconnect();
+			disableVideoControls();
+			Hell.DispatcherInstance = undefined;
+		});
+
+	});
+</script>
+</head>
+
+<body>
+<div id="ytapiplayer">
+You need Flash player 8+ and JavaScript enabled to view this video.
+</div>
+<!--<textarea id="txtaOutput" cols="120" rows="10"></textarea>-->
+<br/>
+<b>Controles video:</b><br/>
+<input id="txtVideoId" type="text" size="12" value="76ley2v2s9w"></input>
+<input id="btnLoad" type="button" value="Load"></input>
+<input id="btnPlay" type="button" value="Play"></input>
+<input id="btnPause" type="button" value="Pause"></input>
+<input id="btnMute" type="button" value="Mute/Unmute"></input>
+<input id="txtSeek" type="text" width="12"></input>
+<input id="btnSeek" type="button" value="Seek"></input>
+<br/>
+<b>Controles red:</b><br/>
+<input id="btnConectar" type="button" value="Conectar"></input>
+<input id="btnDesconectar" type="button" value="Desconectar"></input>
+</body>
+</html>

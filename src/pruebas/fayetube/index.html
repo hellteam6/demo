@@ -15,10 +15,10 @@ Pruebas Faye
 	Hell.Video = function Video(videoId) {
 		// attributes
 		// constructor 
-    	var params = { allowScriptAccess: "always" };
-    	var atts = { id: "myytplayer" };
-    	swfobject.embedSWF("http://www.youtube.com/v/"+videoId+"?enablejsapi=1&playerapiid=ytplayer&version=3",
-                       "ytapiplayer", "425", "356", "8", null, null, params, atts);	
+		var params = { allowScriptAccess: "always" };
+		var atts = { id: "myytplayer" };
+		swfobject.embedSWF("http://www.youtube.com/v/"+videoId+"?enablejsapi=1&playerapiid=ytplayer&version=3",
+			"ytapiplayer", "425", "356", "8", null, null, params, atts);	
 		// methods
 	}
 
@@ -59,21 +59,20 @@ Pruebas Faye
 	};
 
 	// NetEvent class
-	
 	Hell.NetEvent = function NetEvent(type, value) {
+		this.EvtType = {
+			LOAD : 0,
+			PLAY : 1,
+			PAUSE : 2,
+			TOGGLESOUND : 3,
+			SEEK : 4
+		}
 		this.type = type;
 		this.value = value;
 	};
 	Hell.NetEvent.EvtType = {
-		LOAD : 0,
-		PLAY : 1,
-		PAUSE : 2,
-		TOGGLESOUND : 3,
-		SEEK : 4
-	}
-
-	// Youtube plugin events
 	
+	// Youtube plugin events
 	function onYouTubePlayerReady(playerId) {
 		console.info('Youtube player ready.');
 		$('#myytplayer').addEventListener("onStateChange", "onytplayerStateChange");
@@ -110,46 +109,45 @@ Pruebas Faye
 
 		disableVideoControls();
 
-        $('#btnLoad').click( function() {
+		$('#btnLoad').click( function() {
 			Hell.DispatcherInstance.SendEvent(new Hell.NetEvent(Hell.NetEvent.EvtType.LOAD, $('#txtVideoId').val()));
 		});
 		$('#btnPlay').click( function() {
 			Hell.DispatcherInstance.SendEvent(new Hell.NetEvent(Hell.NetEvent.EvtType.PLAY, 0));
 		});	
-        $('#btnPause').click( function() {
+		$('#btnPause').click( function() {
 			Hell.DispatcherInstance.SendEvent(new Hell.NetEvent(Hell.NetEvent.EvtType.PAUSE, 0));
 		});
-        $('#btnMute').click( function() {
+		$('#btnMute').click( function() {
 			Hell.DispatcherInstance.SendEvent(new Hell.NetEvent(Hell.NetEvent.EvtType.TOGGLESOUND, 0));
 		});
-        $('#btnSeek').click( function() {
+		$('#btnSeek').click( function() {
 			Hell.DispatcherInstance.SendEvent(new Hell.NetEvent(Hell.NetEvent.EvtType.SEEK, $('#txtSeek').val()));
 		});
-
 	
 		$('#btnConectar').click( function() {
 
-				Hell.DispatcherInstance = new Hell.Dispatcher(function(evt) {
-					if(evt.type == Hell.NetEvent.EvtType.LOAD) {
-						$('#myytplayer').get(0).loadVideoById(evt.value);
-					} else if(evt.type == Hell.NetEvent.EvtType.PLAY) {
-						$('#myytplayer').get(0).playVideo();
-					} else if(evt.type == Hell.NetEvent.EvtType.PAUSE) {
-						$('#myytplayer').get(0).pauseVideo();
-					} else if(evt.type == Hell.NetEvent.EvtType.TOGGLESOUND) {
-						if($('#myytplayer').get(0).isMuted()) {
-							$('#myytplayer').get(0).unMute();
-						} else { 
-							$('#myytplayer').get(0).mute();
-						}
-					} else if(evt.type == Hell.NetEvent.EvtType.SEEK) {
-						$('#myytplayer').get(0).seekTo(evt.value,true);
+			Hell.DispatcherInstance = new Hell.Dispatcher(function(evt) {
+				if(evt.type == Hell.NetEvent.EvtType.LOAD) {
+					$('#myytplayer').get(0).loadVideoById(evt.value);
+				} else if(evt.type == Hell.NetEvent.EvtType.PLAY) {
+					$('#myytplayer').get(0).playVideo();
+				} else if(evt.type == Hell.NetEvent.EvtType.PAUSE) {
+					$('#myytplayer').get(0).pauseVideo();
+				} else if(evt.type == Hell.NetEvent.EvtType.TOGGLESOUND) {
+					if($('#myytplayer').get(0).isMuted()) {
+						$('#myytplayer').get(0).unMute();
+					} else { 
+						$('#myytplayer').get(0).mute();
 					}
-				});
+				} else if(evt.type == Hell.NetEvent.EvtType.SEEK) {
+					$('#myytplayer').get(0).seekTo(evt.value,true);
+				}
+			});
 
-				Hell.DispatcherInstance.Connect( function() {
-					enableVideoControls();
-				});
+			Hell.DispatcherInstance.Connect( function() {
+				enableVideoControls();
+			});
 		});
 
 		$('#btnDesconectar').click( function() {

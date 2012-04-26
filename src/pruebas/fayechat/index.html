@@ -39,6 +39,7 @@ Pruebas Faye
 
 		this.Disconnect = function() {
 			this.subscription.cancel();
+			console.info('Suscripcion bayeux terminada');
 		}
 	
 		this.Connect = function(connectCallback) {
@@ -88,7 +89,7 @@ Pruebas Faye
 
 		$('#btnDesconectar').click( function() {
 			Hell.ChatInstance.SendNotice(Hell.ChatInstance.nick + ' desconectado.');
-			console.info('Suscripcion bayeux terminada');
+			Hell.ChatInstance.Disconnect();
 			Hell.ChatInstance = undefined;
 		});
 

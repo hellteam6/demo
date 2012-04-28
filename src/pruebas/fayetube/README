@@ -1,0 +1,30 @@
+
+Prueba de concepto nodejs+faye+youtube
+
+1.Ejecucion:
+
+- Cambiar las dos url's dependientes del entorno de ejecucion en index.html
+<script type="text/javascript" src="http://ks209234.kimsufi.com:8000/fayetube/client.js"></script>
+<script type="text/javascript">
+    //Url config faye
+        var config_url_faye = 'http://ks209234.kimsufi.com:8000/fayetube';
+
+- Ejecutar "node server.js"
+
+2.Explicacion:
+
+El servidor http se crea con la API http.createServer() de nodejs, despues
+atachamos el procesador de requests bayeux a la url /fayetube mediante un NodeAdapter
+apropiado de la lib de faye.
+
+Cuando conectamos con un cliente este descarga el index.html que contiene referencias
+al js de la parte cliente de faye. Una vez el usuario pulsa conectar nos suscribimos
+al canal /bayeuxchannel mediante la API cliente de faye. Si el canal no existia se crea automaticamente.
+A partir de este momento ya podemos enviar o recibir eventos por este canal.
+
+El servidor nodejs/faye se encarga de procesar todas las peticiones ajax o websocket que traen eventos
+desde los clientes y los enruta a sus destinos correspondientes.
+
+3.Otra info
+
+El cliente js utiliza las funciones console.log, console.warn y otras de firebug para debugging

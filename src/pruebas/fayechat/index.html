@@ -5,8 +5,11 @@
 Pruebas Faye 
 </title>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script type="text/javascript" src="http://localhost:8000/fayechat/client.js"></script>
+<script type="text/javascript" src="http://ks209234.kimsufi.com:8000/fayechat/client.js"></script>
 <script type="text/javascript">
+
+	//Url config faye
+	var config_url_faye = 'http://ks209234.kimsufi.com:8000/fayechat';
 
 	//Namespace Hell
 	var Hell = Hell || {};
@@ -43,7 +46,7 @@ Pruebas Faye
 		}
 	
 		this.Connect = function(connectCallback) {
-			this.client = new Faye.Client('http://localhost:8000/fayechat');
+			this.client = new Faye.Client(config_url_faye);
 			this.subscription = this.client.subscribe(this.DEFCHANNEL, this.msgCallback);
 			this.subscription.callback(function() {
 				console.info('Suscripcion bayeux completada.');

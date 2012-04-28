@@ -8,6 +8,8 @@ Pruebas Faye
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script type="text/javascript" src="http://ks209234.kimsufi.com:8000/fayetube/client.js"></script>
 <script type="text/javascript">
+	//Url config faye
+	var config_url_faye = 'http://ks209234.kimsufi.com:8000/fayetube';
 
 	//Namespace Hell
 	var Hell = Hell || {};
@@ -26,7 +28,7 @@ Pruebas Faye
 	Hell.Dispatcher = function Dispatcher(evtCallback) {
 
 		// attributes
-		this.DEFCHANNEL = '/fayetube';	
+		this.DEFCHANNEL = '/bayeuxchannel';	
 		this.client = undefined;
 		this.subscription = undefined;
 		this.evtCallback = evtCallback;
@@ -40,7 +42,7 @@ Pruebas Faye
 		}
 
 		this.Connect = function(connectCallback) {
-			this.client = new Faye.Client('http://ks209234.kimsufi.com:8000/fayetube');
+			this.client = new Faye.Client(config_url_faye);
 			this.subscription = this.client.subscribe(this.DEFCHANNEL, this.evtCallback);
 			this.subscription.callback(function() {
 				console.info('Suscripcion bayeux completada.');

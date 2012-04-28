@@ -1,0 +1,121 @@
+<html>
+
+<head>
+<title>
+Pruebas Faye 
+</title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ks209234.kimsufi.com:8000/fayechat/client.js"></script>
+<script type="text/javascript">
+
+	//Url config faye
+	var config_url_faye = 'http://ks209234.kimsufi.com:8000/fayechat';
+
+	//Namespace Hell
+	var Hell = Hell || {};
+
+	// Chat class
+	Hell.Chat = function Chat(nick, msgCallback) {
+
+		// attributes
+		this.DEFCHANNEL = '/chat';	
+		this.nick = nick;
+		this.client = undefined;
+		this.subscription = undefined;
+		this.msgCallback = msgCallback;
+
+		// methods
+		this.SendEvent = function(evt) {
+			var pub = this.client.publish(this.DEFCHANNEL, evt);
+			pub.errback( function(error) {
+				console.error(error.message);
+			});
+		}
+	
+		this.SendMessage = function(value) {
+			this.SendEvent(new Hell.ChatEvent(this.nick, value));
+		}
+
+		this.SendNotice = function(value) {
+			this.SendEvent(new Hell.ChatEvent('Info', value));
+		}
+
+		this.Disconnect = function() {
+			this.subscription.cancel();
+			console.info('Suscripcion bayeux terminada');
+		}
+	
+		this.Connect = function(connectCallback) {
+			this.client = new Faye.Client(config_url_faye);
+			this.subscription = this.client.subscribe(this.DEFCHANNEL, this.msgCallback);
+			this.subscription.callback(function() {
+				console.info('Suscripcion bayeux completada.');
+				connectCallback();
+			});
+			this.subscription.errback(function(error) {
+				console.error(error.message);
+			});
+		}
+	
+	};
+
+	// ChatEvent class
+	Hell.ChatEvent = function ChatEvent(nick, value) {
+		this.nick = nick;
+		this.value = value;
+	};
+
+	// Interface	
+	$(document).ready(function() {
+	
+		$('#btnConectar').click( function() {
+
+			var nick = $('#txtNick').val();
+
+			if(nick == '') {
+				alert('Introduce un nick.');	
+			} else {
+
+				Hell.ChatInstance = new Hell.Chat(nick, function(message) {
+					$('#txtaOutput').val($('#txtaOutput').val()+'<'+message.nick+'> '+message.value+'\n');
+				});
+				Hell.ChatInstance.Connect( function() {
+					Hell.ChatInstance.SendNotice(nick + ' conectado.');
+				});
+			}
+		});
+
+		$('#btnEnviar').click( function() {
+			Hell.ChatInstance.SendMessage($('#txtInput').val());
+			$('#txtInput').val('');
+		});
+
+		$('#btnDesconectar').click( function() {
+			Hell.ChatInstance.SendNotice(Hell.ChatInstance.nick + ' desconectado.');
+			Hell.ChatInstance.Disconnect();
+			Hell.ChatInstance = undefined;
+		});
+
+		$('#btnLimpiar').click( function() {
+			$('#txtaOutput').val('');
+		});
+	});
+</script>
+</head>
+
+<body>
+<textarea id="txtaOutput" cols="120" rows="10"></textarea>
+<br/>
+<input id="txtInput" type="text" width="220"></input>
+<input id="btnEnviar" type="button" value="Enviar"></input>
+<br/>
+<br/>
+<br/>
+<b>Controles:</b>
+<br/>
+Nick: <input id="txtNick" type="text" width="20"></input>
+<input id="btnConectar" type="button" value="Conectar"></input>
+<input id="btnDesconectar" type="button" value="Desconectar"></input>
+<input id="btnLimpiar" type="button" value="Limpiar"></input>
+</body>
+</html>

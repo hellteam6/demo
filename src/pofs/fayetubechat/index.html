@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+Prueba de concepto: varias aplicaciones usando un mismo canal
+</title>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/flick/jquery-ui.css" type="text/css" />
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dojo/dojo.js"></script>
+<script type="text/javascript" src="http://ks209234.kimsufi.com:8000/bayeuxhandler/client.js"></script>
+<script type="text/javascript">
+	//Url config faye
+	var config_url_faye = 'http://ks209234.kimsufi.com:8000/bayeuxhandler';
+
+	//Namespace Hell
+	var Hell = Hell || {};
+
+	// Dispatcher class
+	Hell.Dispatcher = function Dispatcher(evtCallback) {
+
+		// attributes
+		this.DEFCHANNEL = '/defaultchannel';	
+		this.client = undefined;
+		this.subscription = undefined;
+		this.evtCallback = evtCallback;
+
+		// methods
+		this.SendEvent = function(evt) {
+			var pub = this.client.publish(this.DEFCHANNEL, evt);
+			pub.errback( function(error) {
+				console.error(error.message);
+			});
+		}
+
+		this.Connect = function(connectCallback) {
+			this.client = new Faye.Client(config_url_faye);
+			this.subscription = this.client.subscribe(this.DEFCHANNEL, this.evtCallback);
+			this.subscription.callback(function() {
+				console.info('Suscripcion bayeux completada.');
+				connectCallback();
+			});
+			this.subscription.errback(function(error) {
+				console.error(error.message);
+			});
+		}
+
+		this.Disconnect = function() {
+			this.subscription.cancel();
+			console.info('Suscripcion bayeux terminada.');
+		}
+	
+	};
+
+
+	/*Hell.Video = function Video(videoId) {
+		// attributes
+		// constructor 
+		var params = { allowScriptAccess: "always" };
+		var atts = { id: "myytplayer" };
+		swfobject.embedSWF("http://www.youtube.com/v/"+videoId+"?enablejsapi=1&playerapiid=ytplayer&version=3",
+			"ytapiplayer", "425", "356", "8", null, null, params, atts);	
+		// methods
+	}
+
+	// Youtube plugin events
+	function onYouTubePlayerReady(playerId) {
+		console.info('Youtube player ready.');
+		$('#myytplayer').addEventListener("onStateChange", "onytplayerStateChange");
+	}
+
+	function onytplayerStateChange(newState) {
+   		console.info("Player's new state:" + newState);
+	}*/
+
+	$(document).ready(function() {
+
+		$('#dlgAppChat').dialog({
+			width: 660,
+			height: 420,
+			resizable: false,
+			position: 'left'
+		});
+
+		$('#dlgAppYoutube').dialog({
+			width: 600,
+			height: 420,
+			resizable: false,
+			position: 'right'
+		});
+
+		$('#btnConectar').click( function() {
+
+			Hell.DispatcherInstance = new Hell.Dispatcher(function(evt) {
+				// Handle events
+			});
+
+			Hell.DispatcherInstance.Connect( function() {
+				// Do something after connection
+			});
+		});
+
+		$('#btnDesconectar').click( function() {
+			Hell.DispatcherInstance.Disconnect();
+		});
+
+	});
+</script>
+</head>
+
+<body>
+<div id="dlgAppChat" class="dialog_window" title="App Chat">
+	<textarea id="txtaChat" cols="60" rows="13"></textarea>
+	<input id="txtChatInput" type="text" size="50"></input>
+	<input id="btnChatSend" type="button" value="Enviar"></input>
+</div>
+<div id="dlgAppYoutube" class="dialog_window" title="App YouTube">
+<iframe width="560" height="315" src="http://www.youtube.com/embed/VhHdT9zlZxc" frameborder="0" allowfullscreen></iframe>
+</div>
+<b>Controles bayeux:</b><br/>
+<input id="btnConectar" type="button" value="Conectar"></input>
+<input id="btnDesconectar" type="button" value="Desconectar"></input>
+</body>
+</html>

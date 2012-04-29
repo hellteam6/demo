@@ -9,10 +9,10 @@ Prueba de concepto: varias aplicaciones usando un mismo canal
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dojo/dojo.js"></script>
-<script type="text/javascript" src="http://ks209234.kimsufi.com:8000/bayeuxhandler/client.js"></script>
+<script type="text/javascript" src="bayeuxhandler/client.js"></script>
 <script type="text/javascript">
 	//Url config faye
-	var config_url_faye = 'http://ks209234.kimsufi.com:8000/bayeuxhandler';
+	var config_url_faye = location + 'bayeuxhandler';
 
 	//Namespace Hell
 	var Hell = Hell || {};
@@ -105,6 +105,62 @@ Prueba de concepto: varias aplicaciones usando un mismo canal
 			Hell.DispatcherInstance.Disconnect();
 		});
 
+	});
+
+	dojo.declare('Car', null, {
+		reg_no: '',
+		current_speed: 0,
+		current_gear: 0,
+		constructor: function(properties) {
+			this.reg_no = properties.reg_no;
+		},
+		accelerate: function(increment) {
+			this.current_speed += increment;
+		},
+		decelerate: function(decrement) {
+			this.current_speed -= decrement;
+		},
+		increaseGear: function() {
+			this.current_gear ++;
+		},
+		decreaseGear: function() {
+			this.current_gear --;
+		}
+	});
+
+	dojo.declare('Flyer', null, {
+		flying_speed: 0,
+		constructor: function(properties) {
+			this.flying_speed = properties.flying_speed;	
+		},
+		fly: function() {
+			console.log('flying at '+this.flying_speed+' :)');
+		}
+	});
+
+	dojo.declare('ATFLYCar', [Car, Flyer], {
+		accelerate: function(increment) {
+			this.inherited(arguments);
+			if(increment >= 10) {
+				this.increaseGear();
+			}
+		},
+		decelerate: function(decrement) {
+			this.inherited(arguments);
+			if(decrement >= 10) {
+				this.decreaseGear();
+			}
+		}
+	}); 
+
+	dojo.addOnLoad(function() {
+		console.info('dojo loaded');
+		var myCar = new ATFLYCar({reg_no:'10C500', flying_speed:100});
+		myCar.accelerate(30);
+		myCar.accelerate(20);
+		myCar.decelerate(5);
+		myCar.fly();
+		console.log(myCar.reg_no+' traveling at '+myCar.current_speed+' mph in gear '+myCar.current_gear);
 	});
 </script>
 </head>

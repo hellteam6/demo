@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+Prueba de concepto: OOP en Dojo. 
+</title>
+<script>
+dojoConfig = {
+	async: true,
+	dojoBlankHtmlUrl: location.pathname.replace(/\/[^/]*$/, '') + '/blank.html',
+	packages: [{
+		name: 'carlib',
+		location: location.pathname.replace(/\/[^/]*$/, '') + '/js/carlib' 
+	}]
+};
+</script>
+<script src="//ajax.googleapis.com/ajax/libs/dojo/1.7.2/dojo/dojo.js"></script>
+<script>
+	
+	require(["carlib/Car", "carlib/ATCar", "carlib/ATCarEntity", "carlib/Destroyer", "dojo/domReady!" ], 
+	function(Car, ATCar, ATCarEntity, Destroyer) {
+		var car = new Car({reg_no:"Normal car"});
+		car.accelerate(20);
+		car.accelerate(20);
+		car.decelerate(5);
+		console.log(car.reg_no+" travelling at "+car.current_speed+" mph");
+
+		var car2 = new ATCar({reg_no:"Gear car"});
+		car2.accelerate(20);
+		car2.accelerate(20);
+		car2.decelerate(5);
+		console.log(car2.reg_no+" travelling at "+car2.current_speed+" mph in gear "+car2.current_gear);
+
+		var car3 = new ATCarEntity({reg_no:"Car entity"});
+		car3.position = [2,3,4];
+		console.log(car3);
+
+		var destroyer = new Destroyer();
+		var not_a_car = 0;
+		car.destroy();
+		destroyer.crush(car2);
+		destroyer.crush(car3);
+		destroyer.crush(not_a_car);	
+
+	});
+
+</script>
+</head>
+
+<body>
+<h1 id="greeting">Pruebas OOP Dojo.</h1>
+</body>
+</html>

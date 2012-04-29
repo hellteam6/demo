@@ -1,0 +1,10 @@
+Server.js contiene un servidor basico HTTP en nodejs. Sirve archivos estaticos en
+todas las url excepto las del tipo /bayeuxhandler* que son servidas por la lib Faye. 
+
+Para ejecutar cualquiera de los ejemplos:
+
+node server.js <nombre_ejemplo>
+
+p.ej:
+
+node server.js dojoOOP

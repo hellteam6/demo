@@ -3,12 +3,6 @@ Prueba de concepto nodejs+faye+youtube
 
 1.Ejecucion:
 
-- Cambiar las dos url's dependientes del entorno de ejecucion en index.html
-<script type="text/javascript" src="http://ks209234.kimsufi.com:8000/fayetube/client.js"></script>
-<script type="text/javascript">
-    //Url config faye
-        var config_url_faye = 'http://ks209234.kimsufi.com:8000/fayetube';
-
 - Ejecutar "node server.js"
 
 2.Explicacion:

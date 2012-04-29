@@ -1,0 +1,15 @@
+Ejemplo de OOP en javascript utilizando dojo.
+
+docs:
+http://www.ibm.com/developerworks/library/wa-ground2/?cmp=dw&cpb=dwwdv&ct=dwnew&cr=dwnen&ccy=zz&csr=020311
+http://www.ibm.com/developerworks/web/library/wa-aj-dojo/
+http://dojotoolkit.org/documentation/tutorials/1.7/declare/
+
+importante: Utilizar dojo a traves de CDN y a la vez scripts en local como en estos
+ejemplos necesita algunos trucos que vienen indicados en el link siguiente.
+
+http://dojotoolkit.org/documentation/tutorials/1.7/cdn/
+
+Segun la documentacion de dojo es mas eficiente obtener los scripts sin CDN y empaquetados en un
+solo js grande pero en este caso al ser solo un ejemplo el CDN.
+

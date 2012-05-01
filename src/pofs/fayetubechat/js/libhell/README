@@ -1,0 +1,8 @@
+Evento estandar:
+
+var netevt = {
+	identity: this._userId,
+   	appId: this._APP_ID,
+	evtType: this._events.EVT_TYPE_SEND,
+	data: $("#txtChatInput")[0].value
+};

@@ -33,8 +33,9 @@ dojoConfig = {
 		"libhell/NetEventDispatcher",
 		"libhell/apps/chat/AppChat", 
 		"libhell/apps/youtube/AppYoutube",
+		"libhell/apps/browser/AppBrowser",
 		"dojo/domReady!" ], 
-	function(lang, $, nodelistdom, NetEventDispatcher, AppChat, AppYoutube) {
+	function(lang, $, nodelistdom, NetEventDispatcher, AppChat, AppYoutube, AppBrowser) {
 
 		$("#btnConectar").attr("disabled", false);
 		$("#btnDesconectar").attr("disabled", true);	
@@ -97,6 +98,23 @@ dojoConfig = {
 						appYoutube.start();
 					};
 
+					//Instanciamos la aplicacion de youtube 
+					var appBrowser = new AppBrowser({
+						channel: "/prueba",
+						dispatcher: net,
+						title: "Browser en /prueba",
+						width: 600,
+						height: 420,
+						resizable: false,
+						position: "bottom",
+						container: $("#dlgAppBrowser")[0]
+					});
+					//Una vez esta lista la abrimos y empezamos a procesar eventos
+					appBrowser.onAppReady = function() {
+						appBrowser.open();
+						appBrowser.start();
+					};
+
 				},
 				function(error) {
 					console.error(error);
@@ -125,6 +143,8 @@ dojoConfig = {
 <div id="dlgAppChat" class="dialog_window" title="App Chat">
 </div>
 <div id="dlgAppYoutube" class="dialog_window" title="App YouTube">
+</div>
+<div id="dlgAppBrowser" class="dialog_window" title="App Browser">
 </div>
 nick:
 <input id="txtNick" type="text" size="12"></input>

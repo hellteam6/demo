@@ -68,6 +68,7 @@ function(require, declare, lang, on, keys, $, AbstractJQueryWindowedApp) {
 		_onSend: function(evt) {
 			console.info('AppChat: Event '+this._events[evt.evtType].name+' received from dispatcher');
 			$("#txtaChat")[0].innerHTML = $("#txtaChat")[0].innerHTML + "&lt;"+evt.identity+"&gt; " + evt.data + '\n';
+			$("#txtaChat")[0].scrollTop = 9999;	
 		}
 	});
 });

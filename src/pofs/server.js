@@ -61,20 +61,20 @@ var bayeux = new faye.NodeAdapter({
 
 // Monitoring
 bayeux.bind('handshake', function(clientId) {
-	console.log("[*] bayeux: client \"%s\" connected.", clientId);
+	console.log("[*] ######## bayeux: client \"%s\" connected.", clientId);
 });
 bayeux.bind('subscribe', function(clientId, channel) {
-	console.log("[*] bayeux: client \"%s\" subscribed to channel: \"%s\".", clientId, channel);
+	console.log("[*] ######## bayeux: client \"%s\" subscribed to channel: \"%s\".", clientId, channel);
 });
 bayeux.bind('unsubscribe', function(clientId, channel) {
-	console.log("[*] bayeux: client \"%s\" unsubscribed from channel: \"%s\".", clientId, channel);
+	console.log("[*] ######## bayeux: client \"%s\" unsubscribed from channel: \"%s\".", clientId, channel);
 });
 bayeux.bind('publish', function(clientId, channel, data) {
-	console.log("[*] bayeux: client \"%s\" sent event to channel: \"%s\":", clientId, channel);
+	console.log("[*] ######## bayeux: client \"%s\" sent event to channel: \"%s\":", clientId, channel);
 	console.log("          %j", data);
 });
 bayeux.bind('disconnect', function(clientId) {
-	console.log("[*] bayeux: client \"%s\" disconnected.", clientId);
+	console.log("[*] ######## bayeux: client \"%s\" disconnected.", clientId);
 });
 
 

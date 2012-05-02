@@ -21,14 +21,35 @@ function rewrite(uri) {
 	return result;
 }
 
+// content types
+function getContentType(filename) {
+	var type = '';
+	switch(filename.match(/\.(.*?)$/)[1]) { 
+		case "html":
+		case "htm":
+			type = "text/html";
+			break;
+		case "css":
+			type = "text/css";
+			break;
+		case "ico":
+			type = "image/x-icon";
+			break;
+		default:
+			type = "text/plain";	
+	}
+	return type;	
+}
+
 // http server
 var server = http.createServer( function(request, response) {
 
 	var uri = url.parse(request.url).pathname;
 	var filename = rewrite(uri);
+	var contentType = getContentType(filename);
 
-	console.log("[*] HTTP GET \""+uri+"\"");
-	console.log("[*] serving file: \""+filename+"\"");	  
+	console.log("[*] HTTP GET \"%s\"", uri);
+	console.log("[*] serving file: \"%s\" with content type \"%s\".", filename, contentType);	  
 
 	path.exists(filename, function(exists) {
     	if(!exists) {
@@ -45,7 +66,7 @@ var server = http.createServer( function(request, response) {
 				response.writeHead(500);
 				response.end();
 			} else {
-				response.writeHead(200, {'Content-Type': 'text/html'} );
+				response.writeHead(200, {'Content-Type': contentType} );
 				response.write(data);
 				response.end();
 			}

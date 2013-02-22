@@ -6,21 +6,20 @@ Prueba de concepto: varias aplicaciones usando un mismo canal
 </title>
 <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 <link rel="stylesheet" href="css/style.css" type="text/css" />
-<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/flick/jquery-ui.css" type="text/css" />
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/themes/flick/jquery-ui.css" type="text/css" />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script>
 dojoConfig = {
     async: true,
     packages: [
 		{ name: 'libwebshare', location: location.pathname.replace(/\/[^/]*$/, '') + '/js/libwebshare' },
-		{ name: 'faye', location: "http://localhost:8000/" + 'bayeuxhandler' }
+		{ name: 'faye', location: document.location.origin + '/bayeuxhandler' }
 	]
 };
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojo/dojo.js"></script>
-<!-- <script type="text/javascript" src="/dojo/dojo/dojo.js"></script> -->
 <script type="text/javascript">
 
 	require([ 
@@ -39,7 +38,7 @@ dojoConfig = {
 		$("#txtNick").attr("disabled", false);
 
 		//Creamos el enrutador de eventos
-		var net = new NetEventDispatcher("http://localhost:8000/" + "bayeuxhandler");
+		var net = new NetEventDispatcher(document.location.origin + "/bayeuxhandler");
 
 		$("#btnConectar").on("click", function() {
 			
@@ -102,7 +101,7 @@ dojoConfig = {
 						title: "Browser en /prueba",
 						width: 600,
 						height: 420,
-						resizable: false,
+						resizable: true,
 						position: "bottom",
 						container: $("#dlgAppBrowser")[0]
 					});

@@ -67,7 +67,7 @@ function(declare, win, xhr, lang, domConstruct, AbstractApp) {
 				resizable: this._resizable,
 				position: this._position,
 				autoOpen: false
-			});	
+			});
 			$(this._container).dialog("widget").draggable(
 				"option", { opacity: 0.50, snap: false});
 

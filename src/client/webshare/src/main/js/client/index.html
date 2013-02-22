@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+Prueba de concepto: varias aplicaciones usando un mismo canal
+</title>
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/flick/jquery-ui.css" type="text/css" />
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<script>
+dojoConfig = {
+    async: true,
+    packages: [
+		{ name: 'libwebshare', location: location.pathname.replace(/\/[^/]*$/, '') + '/js/libwebshare' },
+		{ name: 'faye', location: "http://localhost:8000/" + 'bayeuxhandler' }
+	]
+};
+</script>
+<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojo/dojo.js"></script>
+<!-- <script type="text/javascript" src="/dojo/dojo/dojo.js"></script> -->
+<script type="text/javascript">
+
+	require([ 
+		"dojo/_base/lang",
+		"dojo/query",
+		"dojo/NodeList-dom",
+		"libwebshare/NetEventDispatcher",
+		"libwebshare/apps/chat/AppChat", 
+		"libwebshare/apps/youtube/AppYoutube",
+		"libwebshare/apps/browser/AppBrowser",
+		"dojo/domReady!" ], 
+	function(lang, $, nodelistdom, NetEventDispatcher, AppChat, AppYoutube, AppBrowser) {
+
+		$("#btnConectar").attr("disabled", false);
+		$("#btnDesconectar").attr("disabled", true);	
+		$("#txtNick").attr("disabled", false);
+
+		//Creamos el enrutador de eventos
+		var net = new NetEventDispatcher("http://localhost:8000/" + "bayeuxhandler");
+
+		$("#btnConectar").on("click", function() {
+			
+			var identity = $("#txtNick")[0].value;
+			if(identity === "") {
+				alert("Introduce una identidad");
+				return;
+			}
+
+			net.connect(identity);	
+
+			// Nos unimos al canal /prueba
+			net.joinChannel(
+				"/prueba", 
+				function() {
+					
+					$("#btnConectar").attr("disabled", true);
+					$("#btnDesconectar").attr("disabled", false);
+					$("#txtNick").attr("disabled", true);
+	
+					//Instanciamos la aplicacion de chat
+					var appChat = new AppChat({
+						channel: "/prueba",
+						dispatcher: net,
+						title: "Chat en /prueba",
+						width: 660,
+						height: 420,
+						resizable: false,
+						position: "left",
+						container: $("#dlgAppChat")[0] 
+					});
+				
+					//Una vez esta lista la abrimos y empezamos a procesar eventos
+					appChat.onAppReady = function() {
+						appChat.open();
+						appChat.start();
+					};
+
+					//Instanciamos la aplicacion de youtube 
+					var appYoutube = new AppYoutube({
+						channel: "/prueba",
+						dispatcher: net,
+						title: "Youtube en /prueba",
+						width: 600,
+						height: 420,
+						resizable: false,
+						position: "right",
+						container: $("#dlgAppYoutube")[0]
+					});
+					//Una vez esta lista la abrimos y empezamos a procesar eventos
+					appYoutube.onAppReady = function() {
+						appYoutube.open();
+						appYoutube.start();
+					};
+
+					//Instanciamos la aplicacion de youtube 
+					var appBrowser = new AppBrowser({
+						channel: "/prueba",
+						dispatcher: net,
+						title: "Browser en /prueba",
+						width: 600,
+						height: 420,
+						resizable: false,
+						position: "bottom",
+						container: $("#dlgAppBrowser")[0]
+					});
+					//Una vez esta lista la abrimos y empezamos a procesar eventos
+					appBrowser.onAppReady = function() {
+						appBrowser.open();
+						appBrowser.start();
+					};
+
+				},
+				function(error) {
+					console.error(error);
+				}
+			);
+		});
+	
+		$("#btnDesconectar").on("click", function() {
+				
+			net.exitChannel("/prueba");
+			net.disconnect();
+			
+			$("#btnConectar").attr("disabled", false);
+			$("#btnDesconectar").attr("disabled", true);
+			$("#txtNick").attr("disabled", false);
+		});
+	
+	
+		
+		
+	});
+</script>
+</head>
+
+<body>
+<div id="dlgAppChat" class="dialog_window" title="App Chat">
+</div>
+<div id="dlgAppYoutube" class="dialog_window" title="App YouTube">
+</div>
+<div id="dlgAppBrowser" class="dialog_window" title="App Browser">
+</div>
+nick:
+<input id="txtNick" type="text" size="12"></input>
+<input id="btnConectar" type="button" value="Conectar"></input>
+<input id="btnDesconectar" type="button" value="Desconectar"></input>
+</body>
+</html>
